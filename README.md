@@ -1,7 +1,8 @@
 # OpenDMP
-DMP for collecting events data.
+A Data Managment Platform for collecting data through java script pixel and segmenting the users. Sharing/Integrating the Segment users to DSP for targetting.
 
-Build Steps
+# Build Steps
 	mvn clean install
 
-Under Progress - :)
+# Status
+	Under Progress - :)
