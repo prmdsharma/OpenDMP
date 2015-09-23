@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd" >
+<log4j:configuration>
+    <appender name="stdout" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{E MMM dd HH:mm:ss yyyy} %c %-4p %m%n"/>
+        </layout>
+    </appender>
+
+    <appender name="appFileAppender" class="org.apache.log4j.rolling.RollingFileAppender">
+       <param name="MaxBackupIndex" value="500"/>
+        <rollingPolicy class="org.apache.log4j.rolling.TimeBasedRollingPolicy">
+            <param name="FileNamePattern"
+                value="/mnt/logs/serverlog.log.%d{yyyy-MM-dd-HH}" />
+        </rollingPolicy>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ssz}[%c{1}]|%m%n" />
+        </layout>
+    </appender>
+    
+    <appender name="trackFileAppender" class="org.apache.log4j.rolling.RollingFileAppender">
+		<rollingPolicy class="org.apache.log4j.rolling.TimeBasedRollingPolicy">
+			<param name="FileNamePattern"
+				value="/mntlogs/pixel.log.%d{yyyy-MM-dd-HH}" />
+		</rollingPolicy>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%m%n" />
+		</layout>
+	</appender>
+    
+     <appender name="ASYNC_TRACKER" class="org.apache.log4j.AsyncAppender">
+        <param name="BufferSize" value="500"/>
+        <appender-ref ref="trackFileAppender"/>
+    </appender>
+
+    <appender name="ASYNC" class="org.apache.log4j.AsyncAppender">
+        <param name="BufferSize" value="500"/>
+        <appender-ref ref="appFileAppender"/>
+    </appender>
+    
+    <root>
+        <level value="info"/>
+        <appender-ref ref="appFileAppender"/>
+    </root>
+</log4j:configuration>
