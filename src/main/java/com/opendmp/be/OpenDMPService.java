@@ -1,4 +1,4 @@
-package com.dmp.be;
+package com.opendmp.be;
 
 
 

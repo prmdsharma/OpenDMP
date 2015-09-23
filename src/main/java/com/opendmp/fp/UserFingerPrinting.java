@@ -1,4 +1,4 @@
-package com.dmp.fp;
+package com.opendmp.fp;
 
 /**
  * Created by pramod.sharma on 22/09/15.

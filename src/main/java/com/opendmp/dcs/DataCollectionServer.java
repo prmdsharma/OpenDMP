@@ -1,4 +1,4 @@
-package com.dmp.dc;
+package com.opendmp.dc;
 
 /**
  * Created by pramod.sharma on 22/09/15.

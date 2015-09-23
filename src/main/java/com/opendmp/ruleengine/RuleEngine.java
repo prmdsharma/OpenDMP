@@ -1,4 +1,4 @@
-package com.dmp.ruleengine;
+package com.opendmp.ruleengine;
 
 /**
  * Created by pramod.sharma on 22/09/15.
