@@ -19,7 +19,7 @@ import com.opendmp.service.ValidationService;
 import com.opendmp.util.IOUtils;
 
 @Controller
-@RequestMapping("/v1/snapad/pixel")
+@RequestMapping("/v1/opendmp/pixel")
 public class PixelController {
 
     private static Logger  logger = LoggerFactory.getLogger(PixelController.class);
