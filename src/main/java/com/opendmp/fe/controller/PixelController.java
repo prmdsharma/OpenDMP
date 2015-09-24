@@ -112,4 +112,22 @@ public class PixelController {
         return null;
     }
 
+    @RequestMapping({ "/dc" })
+    public ModelAndView recordDCPixel(HttpServletRequest req, HttpServletResponse resp)
+    {
+        try {
+            if (!validationService.isValidRequest(req)) {
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                return null;
+            }
+            JSONObject ptd = IOUtils.getPixelData(req);
+            pixelTrackingService.recordPixel(ptd);
+
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
+
+        return null;
+    }
+
 }
