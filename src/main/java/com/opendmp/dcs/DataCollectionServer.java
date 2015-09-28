@@ -126,6 +126,13 @@ public class DataCollectionServer {
             }
             JSONObject ptd = IOUtils.getPixelData(req);
             pixelTrackingService.recordPixel(ptd);
+            /*
+               if (isCookieSyncRequired)
+                  doCookieSync()
+
+
+             */
+
 
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
