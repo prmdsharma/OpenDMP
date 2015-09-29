@@ -127,7 +127,13 @@ public class DataCollectionServer {
             JSONObject ptd = IOUtils.getPixelData(req);
             pixelTrackingService.recordPixel(ptd);
             /*
-               if (isCookieSyncRequired)
+               if (isNewUser())  // if cookie not found in case of the web
+                  segment = getUserSegmentForNewUser(); //from the  pre-processed cache
+               else
+                  segment = getUserSegmentForOldUser();
+
+
+               if (isCookieSyncRequired(segment))
                   doCookieSync()
 
 
