@@ -14,9 +14,13 @@ public class RuleEngine {
 
     private boolean preProcessXMLConfigToCache()
     {
+        boolean status = false;
         /*
         todo
          */
+
+        return status;
+
     }
 
     public void updateRuleEngineCache()
