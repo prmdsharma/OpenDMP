@@ -1,7 +1,8 @@
 <script type="text/javascript">
  	(function() {
- 		var em = document.createElement('script'); em.type = 'text/javascript'; em.async = true;
- 		em.src = ('https:' == document.location.protocol ? 'https://in-ssl' : 'http://in-cdn') + '.opendmp.com/odmp.js';
- 		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(em, s);
+ 		var od = document.createElement('script');
+ 		od.type = 'text/javascript'; od.async = true;
+ 		od.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'opendmp.com/odmp.js';
+ 		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(od, s);
  	})();
  </script>
