@@ -19,7 +19,7 @@ import com.opendmp.conf.PixelTrackerConfig;
 public class PixelTrackingService {
 
     private static Logger        logger         = LoggerFactory.getLogger(PixelTrackingService.class);
-    private static Logger        trackingLogger = LoggerFactory.getLogger("tracker." + PixelTrackingService.class.getName());
+    private static Logger        trackingLogger = LoggerFactory.getLogger("dcs." + PixelTrackingService.class.getName());
 
     @Autowired
     private KafkaSenderService kafkaSenderService;

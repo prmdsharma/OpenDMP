@@ -206,7 +206,7 @@ public class IOUtils {
 			String param = en.getKey();
 			String[] valArr = en.getValue();
 			if(valArr.length==1){
-				pixelObj.put(param, valArr[1]);
+				pixelObj.put(param, valArr[0]);
 			}else if(valArr.length>1){
 				JSONArray arr = new JSONArray();
 				arr.addAll(Arrays.asList(valArr));

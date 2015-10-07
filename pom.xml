@@ -23,52 +23,13 @@
                 <target>1.7</target>
             </configuration>
         </plugin>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-resources-plugin</artifactId>
-            <executions>
-                <execution>
-                    <id>default-resources</id>
-                    <phase>none</phase>
-                </execution>
-                <execution>
-                    <id>copy-resources</id>
-                    <phase>install</phase>
-                    <goals>
-                        <goal>copy-resources</goal>
-                    </goals>
-                    <configuration>
-                        <outputDirectory>target/libs</outputDirectory>
-                        <resources>
-                            <resource>
-                                <directory>target/${artifactId}-${version}/WEB-INF/lib/</directory>
-                            </resource>
-                        </resources>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <configuration>
-                    <warName>${war-name}</warName>
-                    <attachClasses>true</attachClasses>
-                    <webResources>
-                        <resource>
-                            <directory>src/main/resources</directory>
-                            <targetPath>../data</targetPath>
-                        </resource>
-                    </webResources>
-                </configuration>
-            </plugin>
-
         </plugins>
 
 
     </build>
 
     <dependencies>
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>

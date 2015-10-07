@@ -11,26 +11,26 @@
        <param name="MaxBackupIndex" value="500"/>
         <rollingPolicy class="org.apache.log4j.rolling.TimeBasedRollingPolicy">
             <param name="FileNamePattern"
-                value="/mnt/logs/serverlog.log.%d{yyyy-MM-dd-HH}" />
+                value="/opendmp/logs/serverlog.log.%d{yyyy-MM-dd-HH}" />
         </rollingPolicy>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ssz}[%c{1}]|%m%n" />
         </layout>
     </appender>
     
-    <appender name="trackFileAppender" class="org.apache.log4j.rolling.RollingFileAppender">
+    <appender name="dcsFileAppender" class="org.apache.log4j.rolling.RollingFileAppender">
 		<rollingPolicy class="org.apache.log4j.rolling.TimeBasedRollingPolicy">
 			<param name="FileNamePattern"
-				value="/mntlogs/pixel.log.%d{yyyy-MM-dd-HH}" />
+				value="/opendmp/logs/pixel.log.%d{yyyy-MM-dd-HH}" />
 		</rollingPolicy>
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%m%n" />
 		</layout>
 	</appender>
     
-     <appender name="ASYNC_TRACKER" class="org.apache.log4j.AsyncAppender">
+     <appender name="ASYNC_DCS" class="org.apache.log4j.AsyncAppender">
         <param name="BufferSize" value="500"/>
-        <appender-ref ref="trackFileAppender"/>
+        <appender-ref ref="dcsFileAppender"/>
     </appender>
 
     <appender name="ASYNC" class="org.apache.log4j.AsyncAppender">
@@ -38,6 +38,10 @@
         <appender-ref ref="appFileAppender"/>
     </appender>
     
+    <logger name="dcs.com.opendmp.service.PixelTrackingService" additivity="false">
+        <level value="debug"/>
+        <appender-ref ref="ASYNC_DCS"/>
+    </logger>
     <root>
         <level value="info"/>
         <appender-ref ref="appFileAppender"/>

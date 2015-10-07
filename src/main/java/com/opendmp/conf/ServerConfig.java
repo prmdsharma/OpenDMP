@@ -29,14 +29,13 @@ public class ServerConfig {
 	@Bean
 	public PixelTrackerConfig pixelTrackerConfig() {
 		PixelTrackerConfig config = new PixelTrackerConfig();
-		config.setConsumerEnable(env.getProperty("pixel.consumer.enable",
-				Boolean.class));
+
 		config.setProducerEnable(env.getProperty("pixel.producer.enable",
 				Boolean.class));
-		config.setLogUploadEnable(env.getProperty("pixel.log.upload.enable",
-				Boolean.class));
-		config.setLogPath(env.getProperty("pixel.log.path"));
-		config.setLogUploadPrefix(env.getProperty("pixel.log.upload.prefix"));
+//		config.setLogUploadEnable(env.getProperty("pixel.log.upload.enable",
+//				Boolean.class));
+//		config.setLogPath(env.getProperty("pixel.log.path"));
+//		config.setLogUploadPrefix(env.getProperty("pixel.log.upload.prefix"));
 		return config;
 	}
 
@@ -45,17 +44,7 @@ public class ServerConfig {
 		config.setEnable(env.getProperty("kafka.enable", Boolean.class));
 		config.setProducerBrokerUrl(env.getProperty(
 				"kafka.broker.producer.url", String.class));
-		config.setConsumerBrokerUrl(env.getProperty(
-				"kafka.broker.consumer.url", String.class));
-		config.setConsumerEnable(env.getProperty("kafka.pixel.consumer.enable",
-				Boolean.class));
-		config.setConsumerPartition(env.getProperty(
-				"kafka.pixel.consumer.partition", Integer.class, 0));
 		config.setTopic(env.getProperty("kafka.pixel.topic", String.class));
-		config.setGroupId(env.getProperty("kafka.pixel.consumer.group",
-				String.class));
-		config.setCounsumerThread(env.getProperty(
-				"kafka.pixel.consumer.thread", Integer.class, 1));
 		return config;
 	}
 
