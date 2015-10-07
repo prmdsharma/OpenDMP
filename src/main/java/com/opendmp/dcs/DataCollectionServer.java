@@ -25,7 +25,7 @@ import com.opendmp.util.HTTPUtils;
 
 
 @Controller
-@RequestMapping("/v1/opendmp/pixel")
+@RequestMapping("/dcs/v1/")
 public class DataCollectionServer {
     private static Logger  logger = LoggerFactory.getLogger(DataCollectionServer.class);
 
@@ -46,6 +46,21 @@ public class DataCollectionServer {
             JSONObject ptd = IOUtils.getPixelData(req);
             pixelTrackingService.recordPixel(ptd);
             IOUtils.writePixel(resp);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+        return null;
+    }
+
+    @RequestMapping("/visit")
+    public ModelAndView recordVisit(HttpServletRequest req, HttpServletResponse resp) {
+        try {
+            if (!validationService.isValidRequest(req)) {
+                resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                return null;
+            }
+            JSONObject ptd = IOUtils.getPixelData(req);
+            pixelTrackingService.recordPixel(ptd);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
