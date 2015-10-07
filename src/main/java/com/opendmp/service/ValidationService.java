@@ -68,7 +68,10 @@ public class ValidationService {
     }
 
     private boolean isIpBlacklisted(String sourceip) {
-//        return aeroSpikeDBManager.exists(DB_NAME, "ip_black_list", sourceip);
+        /*
+         todo validate the IP ;
+
+         */
     	return false;
     }
 
