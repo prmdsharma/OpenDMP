@@ -15,13 +15,13 @@ import javax.servlet.http.HttpServletResponse;
  * Created by pramod.sharma on 08/10/15.
  */
 
-@Controller
-@RequestMapping("/ui/")
+//@Controller
+//@RequestMapping("/ui/")
 public class UIController
 {
     private static Logger logger         = LoggerFactory.getLogger(UIController.class);
     private static String apiServerHost = "localhost";
-
+/*
     @RequestMapping(value = { "/", "/welcome**" }, method = RequestMethod.GET)
     public ModelAndView welcomePage()
     {
@@ -92,5 +92,5 @@ public class UIController
         model.setViewName("user");
         return model;
     }
-
+*/
 }
