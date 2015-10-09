@@ -1,9 +1,21 @@
 package com.opendmp.ruleengine;
 
+import com.opendmp.service.PixelTrackingService;
+import com.opendmp.service.RuleEngineService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
 /**
  * Created by pramod.sharma on 22/09/15.
  */
 public class RuleEngine {
+    private static Logger logger = LoggerFactory.getLogger(RuleEngine.class);
+
+
+    @Autowired
+    private RuleEngineService ruleEngineService;
+
 
     private void readXMLConfig()
     {
