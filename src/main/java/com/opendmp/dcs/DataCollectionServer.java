@@ -64,6 +64,7 @@ public class DataCollectionServer {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
+
         return null;
     }
 
