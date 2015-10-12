@@ -1,4 +1,3 @@
-<script type="text/javascript">
 
 /*
  * fingerprintJS 0.5.4 - Fast browser fingerprint library
@@ -427,15 +426,14 @@ function DeleteCookie (name,path,domain) {
 
 
 
-var fingerprint = new Fingerprint().get();
+
 var cookie = GetCookie('od.uid');
 if (cookie) {
 }
 else {
+var fingerprint = new Fingerprint().get();
 expdate = new Date();
 expdate.setTime(expdate.getTime()+(365 * 24 * 60 * 60 * 1000));
-SetCookie('od', fingerprint, expdate);
+SetCookie('_od.uid', fingerprint, expdate,'/','.opendmp.in');
+cookie = GetCookie('od.uid');
 }
-
-
-</script>
