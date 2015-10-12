@@ -1,679 +1,441 @@
-/* tag javascript v2.3.1 */
-! function() {
-    var a = {};
-    window._em_tag = {
-        register: function(b, c) {
-            a[b] = c
-        },
-        require: function(b) {
-            if (!a[b]) throw new Error("error: Requested module '" + b + "' has not been defined.");
-            return a[b]
+<script type="text/javascript">
+
+/*
+ * fingerprintJS 0.5.4 - Fast browser fingerprint library
+ * https://github.com/Valve/fingerprintjs
+ * Copyright (c) 2013 Valentin Vasilyev (valentin.vasilyev@outlook.com)
+ * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+ ;(function (name, context, definition) {
+   if (typeof module !== 'undefined' && module.exports) { module.exports = definition(); }
+   else if (typeof define === 'function' && define.amd) { define(definition); }
+   else { context[name] = definition(); }
+ })('Fingerprint', this, function () {
+   'use strict';
+
+   var Fingerprint = function (options) {
+     var nativeForEach, nativeMap;
+     nativeForEach = Array.prototype.forEach;
+     nativeMap = Array.prototype.map;
+
+     this.each = function (obj, iterator, context) {
+       if (obj === null) {
+         return;
+       }
+       if (nativeForEach && obj.forEach === nativeForEach) {
+         obj.forEach(iterator, context);
+       } else if (obj.length === +obj.length) {
+         for (var i = 0, l = obj.length; i < l; i++) {
+           if (iterator.call(context, obj[i], i, obj) === {}) return;
+         }
+       } else {
+         for (var key in obj) {
+           if (obj.hasOwnProperty(key)) {
+             if (iterator.call(context, obj[key], key, obj) === {}) return;
+           }
+         }
+       }
+     };
+
+     this.map = function(obj, iterator, context) {
+       var results = [];
+       // Not using strict equality so that this acts as a
+       // shortcut to checking for `null` and `undefined`.
+       if (obj == null) return results;
+       if (nativeMap && obj.map === nativeMap) return obj.map(iterator, context);
+       this.each(obj, function(value, index, list) {
+         results[results.length] = iterator.call(context, value, index, list);
+       });
+       return results;
+     };
+
+     if (typeof options == 'object'){
+       this.hasher = options.hasher;
+       this.screen_resolution = options.screen_resolution;
+       this.screen_orientation = options.screen_orientation;
+       this.canvas = options.canvas;
+       this.ie_activex = options.ie_activex;
+     } else if(typeof options == 'function'){
+       this.hasher = options;
+     }
+   };
+
+   Fingerprint.prototype = {
+     get: function(){
+       var keys = [];
+       keys.push(navigator.userAgent);
+       keys.push(navigator.language);
+       keys.push(screen.colorDepth);
+       if (this.screen_resolution) {
+         var resolution = this.getScreenResolution();
+         if (typeof resolution !== 'undefined'){ // headless browsers, such as phantomjs
+           keys.push(resolution.join('x'));
+         }
+       }
+       keys.push(new Date().getTimezoneOffset());
+       keys.push(this.hasSessionStorage());
+       keys.push(this.hasLocalStorage());
+       keys.push(!!window.indexedDB);
+       //body might not be defined at this point or removed programmatically
+       if(document.body){
+         keys.push(typeof(document.body.addBehavior));
+       } else {
+         keys.push(typeof undefined);
+       }
+       keys.push(typeof(window.openDatabase));
+       keys.push(navigator.cpuClass);
+       keys.push(navigator.platform);
+       keys.push(navigator.doNotTrack);
+       keys.push(this.getPluginsString());
+       if(this.canvas && this.isCanvasSupported()){
+         keys.push(this.getCanvasFingerprint());
+       }
+       if(this.hasher){
+         return this.hasher(keys.join('###'), 31);
+       } else {
+         return this.murmurhash3_32_gc(keys.join('###'), 31);
+       }
+     },
+
+     /**
+      * JS Implementation of MurmurHash3 (r136) (as of May 20, 2011)
+      *
+      * @author <a href="mailto:gary.court@gmail.com">Gary Court</a>
+      * @see http://github.com/garycourt/murmurhash-js
+      * @author <a href="mailto:aappleby@gmail.com">Austin Appleby</a>
+      * @see http://sites.google.com/site/murmurhash/
+      *
+      * @param {string} key ASCII only
+      * @param {number} seed Positive integer only
+      * @return {number} 32-bit positive integer hash
+      */
+
+     murmurhash3_32_gc: function(key, seed) {
+       var remainder, bytes, h1, h1b, c1, c2, k1, i;
+
+       remainder = key.length & 3; // key.length % 4
+       bytes = key.length - remainder;
+       h1 = seed;
+       c1 = 0xcc9e2d51;
+       c2 = 0x1b873593;
+       i = 0;
+
+       while (i < bytes) {
+           k1 =
+             ((key.charCodeAt(i) & 0xff)) |
+             ((key.charCodeAt(++i) & 0xff) << 8) |
+             ((key.charCodeAt(++i) & 0xff) << 16) |
+             ((key.charCodeAt(++i) & 0xff) << 24);
+         ++i;
+
+         k1 = ((((k1 & 0xffff) * c1) + ((((k1 >>> 16) * c1) & 0xffff) << 16))) & 0xffffffff;
+         k1 = (k1 << 15) | (k1 >>> 17);
+         k1 = ((((k1 & 0xffff) * c2) + ((((k1 >>> 16) * c2) & 0xffff) << 16))) & 0xffffffff;
+
+         h1 ^= k1;
+             h1 = (h1 << 13) | (h1 >>> 19);
+         h1b = ((((h1 & 0xffff) * 5) + ((((h1 >>> 16) * 5) & 0xffff) << 16))) & 0xffffffff;
+         h1 = (((h1b & 0xffff) + 0x6b64) + ((((h1b >>> 16) + 0xe654) & 0xffff) << 16));
+       }
+
+       k1 = 0;
+
+       switch (remainder) {
+         case 3: k1 ^= (key.charCodeAt(i + 2) & 0xff) << 16;
+         case 2: k1 ^= (key.charCodeAt(i + 1) & 0xff) << 8;
+         case 1: k1 ^= (key.charCodeAt(i) & 0xff);
+
+         k1 = (((k1 & 0xffff) * c1) + ((((k1 >>> 16) * c1) & 0xffff) << 16)) & 0xffffffff;
+         k1 = (k1 << 15) | (k1 >>> 17);
+         k1 = (((k1 & 0xffff) * c2) + ((((k1 >>> 16) * c2) & 0xffff) << 16)) & 0xffffffff;
+         h1 ^= k1;
+       }
+
+       h1 ^= key.length;
+
+       h1 ^= h1 >>> 16;
+       h1 = (((h1 & 0xffff) * 0x85ebca6b) + ((((h1 >>> 16) * 0x85ebca6b) & 0xffff) << 16)) & 0xffffffff;
+       h1 ^= h1 >>> 13;
+       h1 = ((((h1 & 0xffff) * 0xc2b2ae35) + ((((h1 >>> 16) * 0xc2b2ae35) & 0xffff) << 16))) & 0xffffffff;
+       h1 ^= h1 >>> 16;
+
+       return h1 >>> 0;
+     },
+
+     // https://bugzilla.mozilla.org/show_bug.cgi?id=781447
+     hasLocalStorage: function () {
+       try{
+         return !!window.localStorage;
+       } catch(e) {
+         return true; // SecurityError when referencing it means it exists
+       }
+     },
+
+     hasSessionStorage: function () {
+       try{
+         return !!window.sessionStorage;
+       } catch(e) {
+         return true; // SecurityError when referencing it means it exists
+       }
+     },
+
+     isCanvasSupported: function () {
+       var elem = document.createElement('canvas');
+       return !!(elem.getContext && elem.getContext('2d'));
+     },
+
+     isIE: function () {
+       if(navigator.appName === 'Microsoft Internet Explorer') {
+         return true;
+       } else if(navigator.appName === 'Netscape' && /Trident/.test(navigator.userAgent)){// IE 11
+         return true;
+       }
+       return false;
+     },
+
+     getPluginsString: function () {
+       if(this.isIE() && this.ie_activex){
+         return this.getIEPluginsString();
+       } else {
+         return this.getRegularPluginsString();
+       }
+     },
+
+     getRegularPluginsString: function () {
+       return this.map(navigator.plugins, function (p) {
+         var mimeTypes = this.map(p, function(mt){
+           return [mt.type, mt.suffixes].join('~');
+         }).join(',');
+         return [p.name, p.description, mimeTypes].join('::');
+       }, this).join(';');
+     },
+
+     getIEPluginsString: function () {
+       if(window.ActiveXObject){
+         var names = ['ShockwaveFlash.ShockwaveFlash',//flash plugin
+           'AcroPDF.PDF', // Adobe PDF reader 7+
+           'PDF.PdfCtrl', // Adobe PDF reader 6 and earlier, brrr
+           'QuickTime.QuickTime', // QuickTime
+           // 5 versions of real players
+           'rmocx.RealPlayer G2 Control',
+           'rmocx.RealPlayer G2 Control.1',
+           'RealPlayer.RealPlayer(tm) ActiveX Control (32-bit)',
+           'RealVideo.RealVideo(tm) ActiveX Control (32-bit)',
+           'RealPlayer',
+           'SWCtl.SWCtl', // ShockWave player
+           'WMPlayer.OCX', // Windows media player
+           'AgControl.AgControl', // Silverlight
+           'Skype.Detection'];
+
+         // starting to detect plugins in IE
+         return this.map(names, function(name){
+           try{
+             new ActiveXObject(name);
+             return name;
+           } catch(e){
+             return null;
+           }
+         }).join(';');
+       } else {
+         return ""; // behavior prior version 0.5.0, not breaking backwards compat.
+       }
+     },
+
+     getScreenResolution: function () {
+       var resolution;
+        if(this.screen_orientation){
+          resolution = (screen.height > screen.width) ? [screen.height, screen.width] : [screen.width, screen.height];
+        }else{
+          resolution = [screen.height, screen.width];
         }
-    }
-}(),
-function() {
-    function a() {
-        return e ? {
-            name: "Internet Explorer",
-            msie: d,
-            version: c.match(/(msie |rv:)(\d+(\.\d+)?)/i)[2]
-        } : n ? {
-            name: "Opera",
-            opera: d,
-            version: c.match(r) ? c.match(r)[1] : c.match(/opr\/(\d+(\.\d+)?)/i)[1]
-        } : f ? {
-            name: "Chrome",
-            webkit: d,
-            chrome: d,
-            version: c.match(/(?:chrome|crios)\/(\d+(\.\d+)?)/i)[1]
-        } : g ? {
-            name: "PhantomJS",
-            webkit: d,
-            phantom: d,
-            version: c.match(/phantomjs\/(\d+(\.\d+)+)/i)[1]
-        } : j ? {
-            name: "TouchPad",
-            webkit: d,
-            touchpad: d,
-            version: c.match(/touchpad\/(\d+(\.\d+)?)/i)[1]
-        } : k ? {
-            name: "Amazon Silk",
-            webkit: d,
-            android: d,
-            mobile: d,
-            version: c.match(/silk\/(\d+(\.\d+)?)/i)[1]
-        } : h || i ? (b = {
-            name: h ? "iPhone" : "iPad",
-            webkit: d,
-            mobile: d,
-            ios: d,
-            iphone: h,
-            ipad: i
-        }, r.test(c) && (b.version = c.match(r)[1]), b) : m ? {
-            name: "Android",
-            webkit: d,
-            android: d,
-            mobile: d,
-            version: (c.match(r) || c.match(s))[1]
-        } : l ? {
-            name: "Safari",
-            webkit: d,
-            safari: d,
-            version: c.match(r)[1]
-        } : p ? (b = {
-            name: "Gecko",
-            gecko: d,
-            mozilla: d,
-            version: c.match(s)[1]
-        }, o && (b.name = "Firefox", b.firefox = d), b) : q ? {
-            name: "SeaMonkey",
-            seamonkey: d,
-            version: c.match(/seamonkey\/(\d+(\.\d+)?)/i)[1]
-        } : {}
-    }
-    var b, c = navigator.userAgent,
-        d = !0,
-        e = /(msie|trident)/i.test(c),
-        f = /chrome|crios/i.test(c),
-        g = /phantom/i.test(c),
-        h = /iphone/i.test(c),
-        i = /ipad/i.test(c),
-        j = /touchpad/i.test(c),
-        k = /silk/i.test(c),
-        l = /safari/i.test(c) && !f && !g && !k,
-        m = /android/i.test(c),
-        n = /opera/i.test(c) || /opr/i.test(c),
-        o = /firefox/i.test(c),
-        p = /gecko\//i.test(c),
-        q = /seamonkey\//i.test(c),
-        r = /version\/(\d+(\.\d+)?)/i,
-        s = /firefox\/(\d+(\.\d+)?)/i,
-        t = a();
-    t.msie && t.version >= 8 || t.chrome && t.version >= 10 || t.firefox && t.version >= 4 || t.safari && t.version >= 5 || t.opera && t.version >= 10 ? t.a = d : t.msie && t.version < 8 || t.chrome && t.version < 10 || t.firefox && t.version < 4 || t.safari && t.version < 5 || t.opera && t.version < 10 ? t.c = d : t.x = d, _em_tag.register("bowser", t)
-}(),
-function() {
-    function a(a, b, c) {
-        if (b)
-            if (c = c || parent, k) try {
-                postMessage.call(c, a, b.replace(/([^:]+:\/\/[^\/]+).*/, "$1"))
-            } catch (d) {
-                c.postMessage(a, b.replace(/([^:]+:\/\/[^\/]+).*/, "$1"))
-            } else b && (c.location = b.replace(/#.*$/, "") + "#" + +new Date + g+++"&" + a)
-    }
+        return resolution;
+     },
 
-    function b(a, g, l) {
-        k ? (a && (f && b(), f = function(b) {
-            return "string" == typeof g && b.origin !== g || "function" == typeof g && g(b.origin) === i ? i : void a(b)
-        }), h[j] ? h[a ? j : "removeEventListener"]("message", f, i) : h[a ? "attachEvent" : "detachEvent"]("onmessage", f)) : (c && clearInterval(c), c = null, a && (l = "number" == typeof g ? g : "number" == typeof l ? l : 100, e = document.location.hash, c = setInterval(function() {
-            var b = document.location.hash,
-                c = /^#?\d+&/;
-            b !== d && b !== e && c.test(b) && (d = b, document.location.hash = e ? e : "", a({
-                data: b.replace(c, "")
-            }))
-        }, l)))
-    }
-    var c, d, e, f, g = 1,
-        h = this,
-        i = !1,
-        j = "addEventListener",
-        k = h.postMessage;
-    _em_tag.register("postmessage", {
-        postMessage: a,
-        receiveMessage: b
-    })
-}(),
-function() {
-    function a(a) {
-        var b = "_em_" + a;
-        return "undefined" != typeof window && window[b] ? window[b] : p[a]
-    }
+     getCanvasFingerprint: function () {
+       var canvas = document.createElement('canvas');
+       var ctx = canvas.getContext('2d');
+       // https://www.browserleaks.com/canvas#how-does-it-work
+       var txt = 'http://valve.github.io';
+       ctx.textBaseline = "top";
+       ctx.font = "14px 'Arial'";
+       ctx.textBaseline = "alphabetic";
+       ctx.fillStyle = "#f60";
+       ctx.fillRect(125,1,62,20);
+       ctx.fillStyle = "#069";
+       ctx.fillText(txt, 2, 15);
+       ctx.fillStyle = "rgba(102, 204, 0, 0.7)";
+       ctx.fillText(txt, 4, 17);
+       return canvas.toDataURL();
+     }
+   };
 
-    function b() {
-        return a("tp")
-    }
 
-    function c() {
-        return q + a("cdn") + a("storage")
-    }
+   return Fingerprint;
 
-    function d() {
-        return a("frameTimeout")
-    }
+ });
 
-    function e(b) {
-        return q + a("cdn") + "/images/" + b
-    }
 
-    function f() {
-        return q + a("dyn") + "/d/6/p"
-    }
 
-    function g() {
-        return q + a("dyn") + "/d/6/s"
-    }
 
-    function h() {
-        return q + a("survey") + "/survey/" + p.theme + "/jquery.speedo." + p.theme + ".min.js"
-    }
-
-    function i() {
-        return q + a("dyn") + "/d/6/i"
-    }
-
-    function j() {
-        return q + a("cdn") + "/d/6/p"
-    }
-
-    function k() {
-        return q + a("dyn") + "/d/6/e"
-    }
-
-    function l() {
-        return q + a("cdn") + "/js/json2.min.js"
-    }
-
-    function m(b) {
-        return q + a("survey") + "/invitation/js/invitation-" + b + ".js"
-    }
-
-    function n() {
-        return q + "//logs-01.loggly.com/inputs/" + p.logglyToken + ".gif"
-    }
-
-    function o() {
-        return '<div id="em-header">FEEDBACK</div><div id="em-logo"><img src="IMAGE_URL"></div><div id="em-message">MESSAGE</div><div id="em-buttons"><button type="button" id="em-ok-btn" class="em-ok">CONFIRM</button> <button type="button" id="em-cancel-btn" class="em-cancel">CANCEL</button></div>'
-    }
-    var p = {
-        cdn: "/prac",
-        dyn: "/prac",
-        storage: "/frame_2.3.1.html",
-        survey: "/",
-        tp: "opendmp.com",
-        frameTimeout: 5e3,
-        theme: "metro",
-        logglyToken: "88bfac63-f1b9-4c33-b83f-e7628b23e754"
-    }, q = window.location.protocol;
-    _em_tag.register("config", {
-        get: a,
-        getImageUrl: e,
-        getPayloadUrl: f,
-        getStorageFrameUrl: c,
-        getSwitchUrl: g,
-        getErrorUrl: k,
-        getJSONUrl: l,
-        getPayloadImageUrl: i,
-        getFrameTimeout: d,
-        getAjaxUrl: j,
-        getTpDomain: b,
-        getOverlayUrl: h,
-        getInvitationMarkup: o,
-        getInvitationUrl: m,
-        getLogglyUrl: n
-    })
-}(),
-function() {
-    function a(a) {
-        a && b(a.name, a.value, a.secs, a.tld, "/")
-    }
-
-    function b(a, b, c, d, e) {
-        var f = new Date,
-            g = "",
-            h = "",
-            i = "";
-        e = e || "/", c && (f.setTime(f.getTime() + 1e3 * c), g = "; expires=" + f.toUTCString()), d && (h = "; domain=." + d), i = encodeURIComponent(b), document.cookie = a + "=" + i + g + h + "; path=" + e
-    }
-
-    function c(a) {
-        for (var b = a + "=", c = document.cookie.split(";"), d = "", e = 0; e < c.length; e++) {
-            for (var f = c[e];
-                " " == f.charAt(0);) f = f.substring(1, f.length);
-            if (0 === f.indexOf(b)) return d = f.substring(b.length, f.length), "undefined" == d ? void 0 : decodeURIComponent(d)
-        }
-        return null
-    }
-    _em_tag.register("cookies", {
-        setItem: a,
-        set: b,
-        get: c
-    })
-}(),
-function() {
-    function a() {
-        v.set("t", "true", 31536e3, w.getTpDomain(), "/");
-        var a = v.get("t");
-        return a ? !0 : !1
-    }
-
-    function b() {
-        v.set("_em_t", "true", 60);
-        var a = v.get("_em_t");
-        return "true" === a ? !0 : !1
-    }
-
-    function c() {
-        return window.self === window.top ? !1 : !0
-    }
-
-    function d() {
-        function a(a) {
-            var b = (Math.random().toString(16) + "000000000").substr(2, 8);
-            return a ? "-" + b.substr(0, 4) + "-" + b.substr(4, 4) : b
-        }
-        return a() + a(!0) + a(!0) + a()
-    }
-
-    function e() {
-        return x
-    }
-
-    function f() {
-        var a = {};
-        return window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(b, c, d) {
-            a[c] = d
-        }), a
-    }
-
-    function g() {
-        var a = f();
-        return a._em_force_survey ? !0 : !1
-    }
-
-    function h(a, b) {
-        var c = window.document.createElement("iframe");
-        c.id = b, c.width = 0, c.height = 0, c.tabindex = -1, c.title = "empty", c.style.display = "none", c.src = a, document.body.insertBefore(c, document.body.firstChild)
-    }
-
-    function i(a, b) {
-        var c = document.getElementsByTagName("script")[0],
-            d = c.parentNode,
-            e = /ded|co/,
-            f = "onload",
-            g = "onreadystatechange",
-            h = "readyState",
-            i = document.createElement("script");
-        i[f] = i[g] = function() {
-            (!this[h] || e.test(this[h])) && (i[f] = i[g] = null, b && b(i), i = null)
-        }, i.async = !0, i.src = a, d.insertBefore(i, c)
-    }
-
-    function j(a) {
-        var b = document.getElementsByTagName("head")[0],
-            c = document.createElement("style");
-        c.type = "text/css", c.styleSheet ? c.styleSheet.cssText = a : c.appendChild(document.createTextNode(a)), b.appendChild(c)
-    }
-
-    function k(a, b) {
-        b = b || {};
-        var c = {};
-        c.pu = window.location.href, c.ru = document.referrer, c.ua = navigator.userAgent, c.ec = a;
-        var d = w.getErrorUrl() + "?";
-        d += n(c);
-        var e = new Image;
-        if (e.src = d, b.raise) throw new Error(a)
-    }
-
-    function l() {
-        return "object" == typeof JSON && "function" == typeof JSON.parse
-    }
-
-    function m(a) {
-        i(w.getJSONUrl(), a)
-    }
-
-    function n(a) {
-        var b = [];
-        for (var c in a) null !== a[c] && b.push(encodeURIComponent(c) + "=" + encodeURIComponent(a[c]));
-        return b.join("&")
-    }
-
-    function o(a, b) {
-        var c = new RegExp(Object.keys(b).join("|"), "g");
-        return a.replace(c, function(a) {
-            return b[a]
-        })
-    }
-
-    function p(a, b) {
-        return Math.floor(Math.random() * (b - a + 1) + a)
-    }
-
-    function q(a) {
-        return a > 0 && 1 === p(1, a)
-    }
-
-    function r() {
-        if (q(1e3)) {
-            var a = new Image;
-            a.src = w.getLogglyUrl() + "?" + t("double_tag", null, window.location.href).join("&")
-        }
-    }
-
-    function s(a, b, c) {
-        var d = new Image;
-        d.src = w.getLogglyUrl() + "?" + t(a, b, c).join("&")
-    }
-
-    function t(a, b, c) {
-        var d = [];
-        return b && (d.push("site_id=" + b.id), d.push("mode=" + b.mode), d.push("languageId=" + b.languageId), d.push("tld=" + b.tld), d.push("device=" + b.devicePlatform), d.push("showPlugin=" + b.showPlugin), d.push("position=" + b.positionClass), d.push("rgId=" + b.rgId), d.push("countryCode=" + b.countryCode), b.exposed && d.push("exposed=" + b.exposed)), d.push("action=" + a), c && d.push("url=" + encodeURIComponent(c)), d
-    }
-
-    function u() {
-        Object.keys || (Object.keys = function(a) {
-            var b = [];
-            for (var c in a) a.hasOwnProperty(c) && b.push(c);
-            return b
-        })
-    }
-    var v = _em_tag.require("cookies"),
-        w = _em_tag.require("config"),
-        x = d();
-    u(), _em_tag.register("utils", {
-        supportsCookies: a,
-        supportsPageCookies: b,
-        getIsIframe: c,
-        guid: e,
-        getUrlParams: f,
-        launchFrame: h,
-        loadScript: i,
-        insertCss: j,
-        reportError: k,
-        loadJSON: m,
-        serializeObjUri: n,
-        hasJSON: l,
-        isTestMode: g,
-        replaceAll: o,
-        logInvite: s,
-        logDoubleTag: r
-    })
-}(),
-function() {
-    function a(a) {
-        this.topics = {}, this.star = [], this.context = a
-    }
-    a.prototype.subscribe = function(a, b) {
-        "*" === a ? this.star.push(b) : (a in this.topics || (this.topics[a] = []), this.topics[a].push(b))
-    }, a.prototype.publish = function(a) {
-        var b;
-        try {
-            b = JSON.parse(a.data)
-        } catch (c) {
-            b = null
-        }
-        if (null !== b) {
-            var d = b.message;
-            if ("undefined" != typeof d) {
-                var e = null,
-                    f = 0;
-                if ("object" == typeof this.topics[d])
-                    for (f = 0; f < this.topics[d].length; f++) e = this.topics[d][f], this.context ? e.call(this.context, b) : e(b);
-                for (f = 0; f < this.star.length; f++) e = this.star[f], this.context ? e.call(this.context, b) : e(b)
+Cookie={
+     /***** Write *****
+     *Arguments:
+     *name: the name of the cookie to set
+     *value: the value to asign to the cookie
+     *days: the days that the cookie will be avaliable, if empty the cookie is deleted when browser close
+     *path: the path to the cookie in domain, if empty its = of the document path
+     ***Domain and others are not defined here, this is meant to be symple
+     Cookie.Write("age",25,7,"/")
+     */
+   Write:function(name,value,days,path){
+     if (days){
+          var date = new Date();
+            date.setTime(date.getTime()+(days*24*60*60*1000));
+            var expires = "; expires="+date.toGMTString();
+     }else var expires = "";
+     if (path){
+        path="; path="+path
+     }else path="";
+     document.cookie = name+"="+value+expires+path;
+   },
+   /***** WriteArray ******
+    *Same as Write but this write a array
+    *Cookie.WriteArray("user",[porfirio,25])
+   */
+   WriteArray:function(name,value,days,path){
+            this.Write(name,value.join("|-|"),days,path);
+     },
+     /***** Exist *****
+      *This will check if a determinated cookie exists
+      *Arguments:
+      *name: the name of the cookie
+      *Cookie.Exist("age") - return Boolean
+     */
+   Exist:function(name){
+     c=document.cookie;
+     i=c.indexOf(name+"=")
+     if (i==-1)
+            return false;
+     else{
+              if (c.charAt(i-1)==" " ||c.charAt(i-1)==";" ||c.charAt(i-1)=="")
+                return true;
+              else
+                return false;
+         }
+     return (document.cookie.indexOf(name+"=")!=-1)
+   },
+   /***** IsArray ****
+    *Returns true or false if the specified cookie is a array or not
+    *Arguments:
+    *name: the name of the cookie
+    *Cookie.IsArray("user")
+     */
+   IsArray:function(name){
+            if (!this.Exist(name)){return 0};
+            return (this.Read(name).indexOf("|-|")!=-1)
+     },
+     /***** Read ****
+      *Return the value of the cookie
+    *Arguments:
+    *name: the name of the cookie
+    *Cookie.Read("age")
+     */
+   Read:function(name){
+        if (this.Exist(name)){
+         c=document.cookie;
+         name=name+"="
+         i=c.indexOf(name)
+         i2=c.indexOf(";",i)
+         if (i2==-1){
+                        return c.substr(i+name.length);
+                 }else{
+                        return c.substring(i+name.length, i2);
+                 }
+            }else{
+                 return "-1";
             }
-        }
-    }, _em_tag.register("pubsub", a)
-}(),
-function() {
-    function a(a) {
-        var d = {};
-        return d.pu = window.location.href, d.ru = document.referrer, d.tz = (new Date).getTimezoneOffset() / -60, d.fv = c.get("_em_vt"), d.ft = c.get("_em_v"), d.fs = c.get("_em_s"), d.fd = c.get("_em_d"), d.fc = b.supportsPageCookies(), d.ii = b.getIsIframe(), d.ua = navigator.userAgent, d.ftm = b.isTestMode(), "undefined" != typeof _em_survey_rate && _em_survey_rate > 0 && (d.fsr = _em_survey_rate), a === !0 && (d.skl = 1), d
-    }
-    var b = _em_tag.require("utils"),
-        c = _em_tag.require("cookies");
-    _em_tag.register("page", {
-        measure: a
-    })
-}(),
-function() {
-    function a(a) {
-        if (!a) return "";
-        var b = encodeURIComponent(a);
-        return b.length > 128 ? b.substring(0, 125) + "..." : b
-    }
+   },
+     /***** ReadArray ****
+      *Return a array with the values of the cookie ( if the cookie have a array )
+    *Arguments:
+    *name: the name of the cookie
+    *Cookie.ReadArray("user")
+     */
+   ReadArray:function(name){
+     if (this.IsArray(name))
+            return this.Read(name).split("|-|");
+     },
+     /***** Delete ****
+      *Delete the cookie with the given name
+    *Arguments:
+    *name: the name of the cookie
+    *Cookie.Delete("user")
+     */
+   Delete:function(name){
+     this.Write(name,"",-1);
+   }
+}
+<!--
+function getCookieVal (offset) {
+  var endstr = document.cookie.indexOf (";", offset);
+  if (endstr == -1)
+    endstr = document.cookie.length;
+  return unescape(document.cookie.substring(offset, endstr));
+}
+function GetCookie (name) {
+  var arg = name + "=";
+  var alen = arg.length;
+  var clen = document.cookie.length;
+  var i = 0;
+  while (i < clen) {
+    var j = i + alen;
+    if (document.cookie.substring(i, j) == arg)
+      return getCookieVal (j);
+    i = document.cookie.indexOf(" ", i) + 1;
+    if (i == 0) break;
+  }
+  return null;
+}
+function SetCookie (name,value,expires,path,domain,secure) {
+  document.cookie = name + "=" + escape (value) +
+    ((expires) ? "; expires=" + expires.toGMTString() : "") +
+    ((path) ? "; path=" + path : "") +
+    ((domain) ? "; domain=" + domain : "") +
+    ((secure) ? "; secure" : "");
+}
+function DeleteCookie (name,path,domain) {
+  if (GetCookie(name)) {
+    document.cookie = name + "=" +
+      ((path) ? "; path=" + path : "") +
+      ((domain) ? "; domain=" + domain : "") +
+      "; expires=Thu, 01-Jan-70 00:00:01 GMT";
+  }
+}
+// -->
 
-    function b(b, c, e) {
-        var g = d.getSwitchUrl() + "?sl=" + c.join(",") + "&vt=" + b.visitorId + "&sid=" + b.id;
-        g += "&lid=" + b.languageId, g += "&dc=" + b.devicePlatform, g += "&tld=" + b.tld, g += "&tc=" + b.tc;
-        var h = f.chrome || f.firefox || f.msie ? b.showPlugin : 0;
-        return g += "&sp=" + h, b.rgId && (g += "&rg=" + b.rgId + "&md=" + b.mode, b.campaignId && (g += "&cid=" + b.campaignId)), e && (g += "&lh=" + a(e.hostname), g += "&lt=" + a(e.pathname)), g
-    }
 
-    function c(a, c, g) {
-        "window" === a.launch || f.safari ? window.open(b(a, c, g)) : "overlay" === a.launch && e.loadScript(d.getOverlayUrl(), function() {
-            jQuery(function() {
-                var f = {
-                    useFrame: !0,
-                    css3Effects: "zoomIn",
-                    theme: d.get("theme"),
-                    href: b(a, c, g),
-                    responsive: !0,
-                    draggable: !1,
-                    width: 800,
-                    height: 600
-                };
-                jQuery.fn.speedoPopup(f), jQuery.noConflict(!0), e.logInvite("overlay_loaded", a)
-            })
-        })
-    }
-    var d = _em_tag.require("config"),
-        e = _em_tag.require("utils"),
-        f = _em_tag.require("bowser");
-    _em_tag.register("launch", {
-        open: c
-    })
-}(),
-function() {
-    function a(a) {
-        var b = a.plugins;
-        b || (b = []), b.unshift({
-            name: "invitation",
-            args: {
-                invitation: a.invitation,
-                surveys: a.surveys
-            }
-        });
-        for (var c = {}, d = 0; d < b.length; d++) {
-            var e = b[d],
-                f = _em_tag.require("plugin." + e.name);
-            "function" == typeof f && f(e.args, c)
-        }
-        return c
-    }
-    _em_tag.register("plugins", {
-        execute: a
-    })
-}(),
-function() {
-    function a() {
-        return {
-            closeButton: !0,
-            closeHtml: '<button id="em-close-btn">&times;</button>',
-            debug: !1,
-            positionClass: "toast-top-left",
-            onclick: null,
-            showDuration: "300",
-            hideDuration: "1000",
-            timeOut: "25000",
-            extendedTimeOut: "1000",
-            showEasing: "swing",
-            hideEasing: "linear",
-            showMethod: "fadeIn",
-            hideMethod: "fadeOut",
-            tapToDismiss: !1
-        }
-    }
 
-    function b(a) {
-        var b = d.getInvitationMarkup(),
-            c = {
-                FEEDBACK: a.header ? a.header : "Please share your feedback",
-                IMAGE_URL: a.logoUrl ? a.logoUrl : d.getImageUrl("logo.png"),
-                MESSAGE: a.message ? a.message : "We are conducting a quick survey to better understand our audience",
-                CONFIRM: a.labelOk ? a.labelOk : "Continue",
-                CANCEL: a.labelCancel ? a.labelCancel : "Cancel"
-            };
-        return b = e.replaceAll(b, c)
-    }
+var fingerprint = new Fingerprint().get();
+var cookie = GetCookie('od.uid');
+if (cookie) {
+}
+else {
+expdate = new Date();
+expdate.setTime(expdate.getTime()+(365 * 24 * 60 * 60 * 1000));
+SetCookie('od', fingerprint, expdate);
+}
 
-    function c(c, f) {
-        var g = b(c),
-            h = a();
-        e.loadScript(d.getInvitationUrl("default"), function() {
-            jQuery.extend(h, c), toastr.options = h;
-            var a = toastr.success(g);
-            jQuery("#em-ok-btn").bind("click", function() {
-                toastr.clear(a), f(!0)
-            }), jQuery("#em-cancel-btn").bind("click", function() {
-                toastr.clear(a), f(!1)
-            }), jQuery("#em-close-btn").bind("click", function() {
-                e.logInvite("close", c)
-            }), jQuery.noConflict(!0), e.logInvite("invite", c)
-        })
-    }
-    var d = _em_tag.require("config"),
-        e = _em_tag.require("utils");
-    _em_tag.register("invitation", {
-        open: c
-    })
-}(),
-function() {
-    function a(a) {
-        if (a.files)
-            for (var c = 0; c < a.files.length; c++) {
-                var d = a.files[c].url;
-                b.loadScript(d)
-            }
-    }
-    var b = _em_tag.require("utils");
-    _em_tag.register("plugin.javascript", a)
-}(),
-function() {
-    function a(a) {
-        if (a.pixel) {
-            var b = new Image;
-            b.src = a.pixel
-        }
-    }
-    _em_tag.register("plugin.neustar", a)
-}(),
-function() {
-    function a(a) {
-        if (a.url) {
-            var b = new Image;
-            b.src = a.url
-        }
-    }
-    _em_tag.register("plugin.lotame", a)
-}(),
-function() {
-    function a(a) {
-        if (a.pixel) {
-            var b = new Image;
-            b.src = a.pixel
-        }
-    }
-    _em_tag.register("plugin.ddp", a)
-}(),
-function() {
-    function a(a, b, c) {
-        var f = d.guid(),
-            g = Math.floor((new Date).getTime() / 1e3),
-            j = document.getElementById(f);
-        i.set("_em_" + a, g, b, c);
-        var k = {
-            name: a,
-            value: g,
-            expires: b
-        }, l = {
-                message: "setCookie",
-                payload: k
-            };
-        h.postMessage(JSON.stringify(l), e.getStorageFrameUrl(), j.contentWindow)
-    }
 
-    function b(b, c) {
-        b && b.id && c && 0 !== c.length && !d.getIsIframe() && f.open(b, function(e) {
-            e ? (a("s", b.ssec, b.tld), g.open(b, c, window.location), d.logInvite("start", b)) : (a("d", b.dsec, b.tld), d.logInvite("reject", b))
-        })
-    }
-
-    function c(a) {
-        b(a.invitation, a.surveys)
-    }
-    var d = _em_tag.require("utils"),
-        e = _em_tag.require("config"),
-        f = _em_tag.require("invitation"),
-        g = _em_tag.require("launch"),
-        h = _em_tag.require("postmessage"),
-        i = _em_tag.require("cookies");
-    _em_tag.register("plugin.invitation", c)
-}(),
-function() {
-    function a() {
-        var a = !0;
-        return o > 0 && (clearTimeout(o), o = -1), p && (a = !1), a
-    }
-
-    function b() {
-        a();
-        var b = m.measure(p),
-            c = {
-                message: "sendPayload",
-                payload: b
-            }, d = document.getElementById(n);
-        k.postMessage(JSON.stringify(c), i.getStorageFrameUrl(), d.contentWindow)
-    }
-
-    function c(b) {
-        a(), h.setItem(b.payload.visitor), h.setItem(b.payload.visit)
-    }
-
-    function d(b) {
-        a(), l.execute(b.payload)
-    }
-
-    function e(a) {
-        a = "undefined" == typeof a ? "#" : "#" + a.toString().replace(/\W/g, "_");
-        var b = m.measure();
-        b.pu += a, b.et = "ajax";
-        var c = {
-            message: "sendPayload",
-            payload: b
-        }, d = document.getElementById(n);
-        k.postMessage(JSON.stringify(c), i.getStorageFrameUrl(), d.contentWindow)
-    }
-
-    function f() {
-        var a = m.measure();
-        if ("object" == typeof window._em) return void g.logDoubleTag();
-        var f = g.getUrlParams();
-        if (f._em_debug) return void g.loadScript(i.get("cdn") + "/js/em.debug.js", function() {});
-        if (window._em = {
-            trackAjaxPageview: e
-        }, "undefined" != typeof _em_image_only || !window.postMessage || !g.hasJSON()) {
-            var h = new Image;
-            return void(h.src = i.getPayloadImageUrl() + "?" + g.serializeObjUri(a))
-        }
-        var l = new j;
-        l.subscribe("getPayload", b), l.subscribe("update", c), l.subscribe("execPlugins", d), k.receiveMessage(function(a) {
-            l.publish(a)
-        }, function(a) {
-            return a.indexOf(i.get("cdn")) >= 0
-        }), o = setTimeout(function() {
-            p = !0;
-            var b = new Image;
-            b.src = i.getPayloadImageUrl() + "?" + g.serializeObjUri(a)
-        }, i.getFrameTimeout()), g.launchFrame(i.getStorageFrameUrl(), n)
-    }
-    var g = _em_tag.require("utils"),
-        h = _em_tag.require("cookies"),
-        i = _em_tag.require("config"),
-        j = _em_tag.require("pubsub"),
-        k = _em_tag.require("postmessage"),
-        l = _em_tag.require("plugins"),
-        m = _em_tag.require("page"),
-        n = g.guid(),
-        o = -1,
-        p = !1;
-    f()
-}();
+</script>
