@@ -31,6 +31,9 @@ public class MongoDBManager {
 	private MongoClient mongoClient;
 	private MongoDatabase mongoDB;
 
+    private String host = "localhost";
+    private String dbname = "odmp";
+
 	public MongoDBManager(String host, String dbName) {
 		init(host, dbName);
 	}
@@ -195,7 +198,6 @@ public class MongoDBManager {
 			logger.error(e.getMessage(), e);
 			return false;
 		}
-
 	}
 
 }
