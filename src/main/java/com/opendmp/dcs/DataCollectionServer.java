@@ -17,9 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
-
-import com.opendmp.service.PixelTrackingService;
-
 import com.opendmp.service.DataCollectionService;
 import com.opendmp.service.ValidationService;
 import com.opendmp.util.IOUtils;

@@ -20,8 +20,8 @@ import com.opendmp.conf.DataCollectionConfig;
 
 @Service
 public class DataCollectionService {
-    private static Logger logger         = LoggerFactory.getLogger(PixelTrackingService.class);
-    private static Logger        trackingLogger = LoggerFactory.getLogger("dcs." + PixelTrackingService.class.getName());
+    private static Logger logger         = LoggerFactory.getLogger(DataCollectionService.class);
+    private static Logger        trackingLogger = LoggerFactory.getLogger("dcs." + DataCollectionService.class.getName());
 
     @Autowired
     private KafkaSenderService kafkaSenderService;

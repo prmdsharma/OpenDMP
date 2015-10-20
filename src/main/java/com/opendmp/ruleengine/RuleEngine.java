@@ -1,6 +1,5 @@
 package com.opendmp.ruleengine;
 
-import com.opendmp.service.PixelTrackingService;
 import com.opendmp.service.RuleEngineService;
 import com.opendmp.service.ValidationService;
 import com.opendmp.util.IOUtils;
@@ -27,9 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 public class RuleEngine {
 
     private static Logger logger = LoggerFactory.getLogger(RuleEngine.class);
-
-    @Autowired
-    private PixelTrackingService pixelTrackingService;
 
     @Autowired
     private ValidationService validationService;
