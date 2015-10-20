@@ -1,6 +1,5 @@
 package com.opendmp.service;
 
-import com.opendmp.conf.PixelTrackerConfig;
 import net.sf.uadetector.ReadableUserAgent;
 import net.sf.uadetector.UserAgentStringParser;
 import org.json.simple.JSONObject;
