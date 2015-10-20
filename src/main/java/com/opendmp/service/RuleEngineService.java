@@ -1,5 +1,6 @@
 package com.opendmp.service;
 
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,11 @@ public class RuleEngineService {
          */
 
         return ruleStatus;
+    }
+
+    public void recordRule(JSONObject ptd)
+    {
+        //todo
     }
 
     public boolean updateRuleEngineCache()
