@@ -19,9 +19,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.opendmp.service.PixelTrackingService;
+
+import com.opendmp.service.DataCollectionService;
 import com.opendmp.service.ValidationService;
 import com.opendmp.util.IOUtils;
-import com.opendmp.util.HTTPUtils;
+
 
 
 @Controller
@@ -31,7 +33,7 @@ public class DataCollectionServer {
 
 
     @Autowired
-    private PixelTrackingService pixelTrackingService;
+    private DataCollectionService dataCollectionService;
 
     @Autowired
     private ValidationService    validationService;
@@ -44,7 +46,7 @@ public class DataCollectionServer {
                 return null;
             }
             JSONObject ptd = IOUtils.getPixelData(req);
-            pixelTrackingService.recordPixel(ptd);
+            dataCollectionService.recordPixel(ptd);
             IOUtils.writePixel(resp);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -60,7 +62,7 @@ public class DataCollectionServer {
                 return null;
             }
             JSONObject ptd = IOUtils.getPixelData(req);
-            pixelTrackingService.recordPixel(ptd);
+            dataCollectionService.recordPixel(ptd);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
@@ -76,7 +78,7 @@ public class DataCollectionServer {
                 return null;
             }
             JSONObject ptd = IOUtils.getPixelData(req);
-            pixelTrackingService.recordPixel(ptd);
+            dataCollectionService.recordPixel(ptd);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
@@ -91,7 +93,7 @@ public class DataCollectionServer {
                 return null;
             }
             JSONObject ptd = IOUtils.getPixelData(req);
-            pixelTrackingService.recordPixel(ptd);
+            dataCollectionService.recordPixel(ptd);
             IOUtils.writePixel(resp);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -116,7 +118,7 @@ public class DataCollectionServer {
                 return null;
             }
             JSONObject ptd = IOUtils.getPixelData(req);
-            pixelTrackingService.recordPixel(ptd);
+            dataCollectionService.recordPixel(ptd);
             try {
                 String rdUrl = URLDecoder.decode(rurl, "UTF-8");
                 resp.sendRedirect(rdUrl);
@@ -142,7 +144,7 @@ public class DataCollectionServer {
                 return null;
             }
             JSONObject ptd = IOUtils.getPixelData(req);
-            pixelTrackingService.recordPixel(ptd);
+            dataCollectionService.recordPixel(ptd);
             /*
                if (isNewUser())  // if cookie not found in case of the web
                   segment = getUserSegmentForNewUser(); //from the  pre-processed cache
@@ -162,6 +164,13 @@ public class DataCollectionServer {
         }
 
         return null;
+    }
+
+    private void getSegmentinfo(JSONObject ptd)
+    {
+
+      //todo
+
     }
 
 
