@@ -39,6 +39,19 @@ public class ServerConfig {
 		return config;
 	}
 
+	@Bean
+	public DataCollectionConfig dataCollectionConfig() {
+		DataCollectionConfig config = new DataCollectionConfig();
+
+		config.setProducerEnable(env.getProperty("pixel.producer.enable",
+				Boolean.class));
+//		config.setLogUploadEnable(env.getProperty("pixel.log.upload.enable",
+//				Boolean.class));
+//		config.setLogPath(env.getProperty("pixel.log.path"));
+//		config.setLogUploadPrefix(env.getProperty("pixel.log.upload.prefix"));
+		return config;
+	}
+
 	public KafkaConfig kafkaPixelConfig() {
 		KafkaConfig config = new KafkaConfig();
 		config.setEnable(env.getProperty("kafka.enable", Boolean.class));
