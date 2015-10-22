@@ -38,7 +38,7 @@
         <appender-ref ref="appFileAppender"/>
     </appender>
     
-    <logger name="dcs.com.opendmp.service.PixelTrackingService" additivity="false">
+    <logger name="dcs.com.opendmp.service.DataCollectionService" additivity="false">
         <level value="debug"/>
         <appender-ref ref="ASYNC_DCS"/>
     </logger>
