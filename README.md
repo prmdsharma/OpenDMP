@@ -6,7 +6,6 @@ A Data Managment Platform for collecting users events data through java script a
 # Installation & Deployment
 	
 # Status
-	Under Progress - :)
+	BackEnd and DCS is ready and working perfectly. Tested with 8K request per seconds.
 	Currently working on ...
-	DC Module
-	Tag Manager
+	UI
