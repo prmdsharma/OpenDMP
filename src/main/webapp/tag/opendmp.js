@@ -428,7 +428,7 @@ var cookie = GetCookie('od.uid');
 if (cookie) {
    expdate = new Date();
    expdate.setTime(expdate.getTime()+(365 * 24 * 60 * 60 * 1000));
-   SetCookie('_od.uid', fingerprint, expdate,'/','.opendmp.in');
+   SetCookie('_od.uid', cookie, expdate,'/','.opendmp.in');
 }
 else {
     var fingerprint = new Fingerprint().get();
