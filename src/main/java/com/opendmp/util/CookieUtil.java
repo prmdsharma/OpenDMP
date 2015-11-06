@@ -36,13 +36,13 @@ public class CookieUtil {
         }
 
         if(existCookie == null) {
-            createCookie(COOKIE_NAME, uid);
+            existCookie = createCookie(COOKIE_NAME, uid);
         }
         else {
-            updateCookie(existCookie);
+            existCookie = updateCookie(existCookie);
         }
 
-
+        res.setHeader("Access-Control-Allow-Origin", "*");
         res.addCookie(existCookie);
     }
 
