@@ -10,6 +10,7 @@ import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.opendmp.util.CookieUtil;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,7 @@ public class DataCollectionServer {
             JSONObject ptd = IOUtils.getPixelData(req);
             dataCollectionService.recordPixel(ptd);
             IOUtils.writePixel(resp);
+            CookieUtil.setCookie(req, resp);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
@@ -59,6 +61,7 @@ public class DataCollectionServer {
                 return null;
             }
             JSONObject ptd = IOUtils.getPixelData(req);
+            CookieUtil.setCookie(req, resp);
             dataCollectionService.recordPixel(ptd);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -75,6 +78,7 @@ public class DataCollectionServer {
                 return null;
             }
             JSONObject ptd = IOUtils.getPixelData(req);
+            CookieUtil.setCookie(req, resp);
             dataCollectionService.recordPixel(ptd);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -91,6 +95,7 @@ public class DataCollectionServer {
             }
             JSONObject ptd = IOUtils.getPixelData(req);
             dataCollectionService.recordPixel(ptd);
+            CookieUtil.setCookie(req, resp);
             IOUtils.writePixel(resp);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -141,6 +146,7 @@ public class DataCollectionServer {
                 return null;
             }
             JSONObject ptd = IOUtils.getPixelData(req);
+            CookieUtil.setCookie(req, resp);
             dataCollectionService.recordPixel(ptd);
             /*
                if (isNewUser())  // if cookie not found in case of the web

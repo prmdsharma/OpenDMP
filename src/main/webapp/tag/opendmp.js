@@ -424,16 +424,4 @@ function DeleteCookie (name,path,domain) {
 }
 // -->
 
-var cookie = GetCookie('od.uid');
-if (cookie) {
-   expdate = new Date();
-   expdate.setTime(expdate.getTime()+(365 * 24 * 60 * 60 * 1000));
-   SetCookie('_od.uid', fingerprint, expdate,'/','.opendmp.in');
-}
-else {
-    var fingerprint = new Fingerprint().get();
-    expdate = new Date();
-    expdate.setTime(expdate.getTime()+(365 * 24 * 60 * 60 * 1000));
-    SetCookie('_od.uid', fingerprint, expdate,'/','.opendmp.in');
-    cookie = GetCookie('od.uid');
-}
+var userFPHash = new Fingerprint().get();
