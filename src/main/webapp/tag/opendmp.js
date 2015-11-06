@@ -1,22 +1,4 @@
 
-/*
- * fingerprintJS 0.5.4 - Fast browser fingerprint library
- * https://github.com/Valve/fingerprintjs
- * Copyright (c) 2013 Valentin Vasilyev (valentin.vasilyev@outlook.com)
- * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
  ;(function (name, context, definition) {
    if (typeof module !== 'undefined' && module.exports) { module.exports = definition(); }
    else if (typeof define === 'function' && define.amd) { define(definition); }
@@ -386,42 +368,8 @@ Cookie={
      this.Write(name,"",-1);
    }
 }
-<!--
-function getCookieVal (offset) {
-  var endstr = document.cookie.indexOf (";", offset);
-  if (endstr == -1)
-    endstr = document.cookie.length;
-  return unescape(document.cookie.substring(offset, endstr));
-}
-function GetCookie (name) {
-  var arg = name + "=";
-  var alen = arg.length;
-  var clen = document.cookie.length;
-  var i = 0;
-  while (i < clen) {
-    var j = i + alen;
-    if (document.cookie.substring(i, j) == arg)
-      return getCookieVal (j);
-    i = document.cookie.indexOf(" ", i) + 1;
-    if (i == 0) break;
-  }
-  return null;
-}
-function SetCookie (name,value,expires,path,domain,secure) {
-  document.cookie = name + "=" + escape (value) +
-    ((expires) ? "; expires=" + expires.toGMTString() : "") +
-    ((path) ? "; path=" + path : "") +
-    ((domain) ? "; domain=" + domain : "") +
-    ((secure) ? "; secure" : "");
-}
-function DeleteCookie (name,path,domain) {
-  if (GetCookie(name)) {
-    document.cookie = name + "=" +
-      ((path) ? "; path=" + path : "") +
-      ((domain) ? "; domain=" + domain : "") +
-      "; expires=Thu, 01-Jan-70 00:00:01 GMT";
-  }
-}
+
 // -->
+
 
 var userFPHash = new Fingerprint().get();
