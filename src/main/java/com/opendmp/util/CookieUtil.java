@@ -16,7 +16,6 @@ public class CookieUtil {
 
     public static void setCookie(HttpServletRequest req, HttpServletResponse res)
     {
-
         Cookie existCookie = null;
         String uid = req.getParameter("uid");
         Cookie[]  cookie = req.getCookies();
@@ -37,13 +36,9 @@ public class CookieUtil {
 
         if(existCookie == null) {
             existCookie = createCookie(COOKIE_NAME, uid);
+            res.setHeader("Access-Control-Allow-Origin", "*");
+            res.addCookie(existCookie);
         }
-        else {
-            existCookie = updateCookie(existCookie);
-        }
-
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        res.addCookie(existCookie);
     }
 
 
