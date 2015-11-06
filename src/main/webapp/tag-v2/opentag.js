@@ -1,7 +1,7 @@
 <div id="opendmo-div">
  <script type="text/javascript">
      var opendmp_dcs = 'dcs';
-     var clientID = ' TestClient';
+     var clientID = 'TestClient';
 
      /* * * DON'T EDIT BELOW THIS LINE * * */
      (function() {
