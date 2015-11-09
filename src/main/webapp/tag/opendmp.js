@@ -376,7 +376,7 @@ var userFPHash = new Fingerprint().get();
              var od = document.createElement('script');
              od.type = 'text/javascript'; od.async = true;
              var ts = new Date().getTime();
-             var queryStr =  'uid=' + userFPHash + '&cid=' + clientID;
+             var queryStr =  'uid=' + userFPHash + '&cid=' + clientID + '&pu=' + document.location.href;
              queryStr += '&ts=' + ts;
              pathStr = '/dcs/v1/visit?';
              od.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'opendmp.in' + pathStr + queryStr;

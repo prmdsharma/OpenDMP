@@ -1,13 +1,14 @@
-
+<div id="opendmo-div">
  <script type="text/javascript">
-    (function() {
-        var od = document.createElement('script');
-        od.type = 'text/javascript'; od.async = true;
-        var ts = new Date().getTime();
-        var queryStr = 'pu=' + {{Page URL}} + '&rurl=' + {{Referrer}} + '&uid=' + userFPHash + '&cid=' + {{Container ID}};
-        queryStr += '&ts=' + ts;
-        pathStr = '/dcs/v1/visit?';
-        od.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'opendmp.in' + pathStr + queryStr;
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(od, s);
-    })();
+     var opendmp_dcs = 'dcs';
+
+
+     /* * * DON'T EDIT BELOW THIS LINE * * */
+     var clientID = 'TestClient';
+     (function() {
+         var odmp = document.createElement('script'); odmp.type = 'text/javascript'; odmp.async = true;
+         odmp.src = '//' + 'dcs.opendmp.in/tag/opendmp.js';
+         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(odmp);
+     })();
  </script>
+ </div>
