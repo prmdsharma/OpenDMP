@@ -7,12 +7,17 @@ package com.opendmp.util;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class CookieUtil {
 
     private final static String COOKIE_NAME = "_od.uid";
     private final static int COOKIE_MAX_AGE_SECONDS = 31536000;
     private final static String COOKIE_PATH = "/";
     private final static String COOKIE_DOMAIN = ".opendmp.in";
+
+    private static Logger  logger = LoggerFactory.getLogger(CookieUtil.class);
 
     public static void setCookie(HttpServletRequest req, HttpServletResponse res)
     {
@@ -27,7 +32,8 @@ public class CookieUtil {
         if(cookie != null) {
             for (int i = 0; i <= cookie.length; i++)
             {
-                if (cookie[i].equals(COOKIE_NAME)) {
+                //logger.error("iteration="+i+"cookie Langth ="+cookie.length+"cookie is:"+cookie[i].getName());
+                if (cookie[i].getName().equals(COOKIE_NAME)) {
                     existCookie = cookie[i];
                     break;
                 }
