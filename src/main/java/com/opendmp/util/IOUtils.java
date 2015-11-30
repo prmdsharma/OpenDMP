@@ -80,21 +80,6 @@ public class IOUtils {
         return visitorId;
     }
 
-    public static String getPogIdFromHeaders(JSONObject headerJson){
-        try{
-            if(headerJson==null){
-                return null;
-            }
-            if(headerJson.get("cookie") instanceof String){
-                String cookieStr = (String) headerJson.get("cookie");
-                
-            }
-        }catch(Exception e){
-            logger.error(e.getMessage(), e);
-        }
-        return null;
-    }
-
     public static String getUserAgent(HttpServletRequest req) {
         String userAgent = req.getHeader("User-Agent");
         return userAgent;
