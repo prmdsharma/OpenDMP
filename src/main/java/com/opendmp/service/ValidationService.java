@@ -2,16 +2,22 @@ package com.opendmp.service;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.opendmp.conf.DomainValidationConfig;
+import com.opendmp.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.opendmp.util.IOUtils;
+import com.opendmp.conf.DomainValidationConfig;
 
 @Service
 public class ValidationService {
 
     private static Logger         logger  = LoggerFactory.getLogger(ValidationService.class);
+    @Autowired
+    private DomainValidationConfig domainValidationConfig;
 
     // private static final int MINUTE_MAX_RATE = 30;
     // private static final int HOUR_MAX_RATE = 1000;
@@ -23,10 +29,7 @@ public class ValidationService {
             logger.debug("IP_BLACKLISTED : " + ip);
             return false;
         }
-        // String visitorId = IOUtils.getVisitorId(req);
-        // if(isRateExceded(ip, visitorId)){
-        // return false;
-        // }
+
         return true;
     }
 
@@ -73,6 +76,24 @@ public class ValidationService {
 
          */
     	return false;
+    }
+
+    private boolean isDomainBlackListed(String srcDomain) {
+        boolean status = false;
+        if (! StringUtils.isEmpty(srcDomain)) {
+           status = domainValidationConfig.isDomainBlacklisted(srcDomain);
+        }
+
+        return status;
+    }
+
+    private boolean isDomainWhiteListed(String srcDomain){
+        boolean status = false;
+        if (! StringUtils.isEmpty(srcDomain)) {
+            status = domainValidationConfig.isDomainWhitelisted(srcDomain);
+        }
+
+        return status;
     }
 
 }

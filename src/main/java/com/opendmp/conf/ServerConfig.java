@@ -84,4 +84,18 @@ public class ServerConfig {
 		return onlineUpdatingParser;
 	}
 
+	public DomainValidationConfig domainValidationConfig() {
+		DomainValidationConfig config = new DomainValidationConfig();
+		config.setEnable(env.getProperty("domain.whitelist.enable", Boolean.class));
+        config.setEnable(env.getProperty("domain.blacklist.enable", Boolean.class));
+        if(config.isDomainBlacklistEnable()){
+            config.updateBlackListDomainMap(env.getProperty("domain.blacklist.list", String.class));
+        }
+
+        if(config.isDomainWhitelistEnable()){
+            config.updateWhiteListDomainMap(env.getProperty("domain.blacklist.list", String.class));
+        }
+		return config;
+	}
+
 }
