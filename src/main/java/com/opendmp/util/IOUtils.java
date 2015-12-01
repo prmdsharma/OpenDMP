@@ -39,6 +39,18 @@ public class IOUtils {
         }
         return sourceip;
     }
+
+    public static String getDomain(HttpServletRequest req){
+        String domain  = req.getRemoteHost();
+
+        return domain;
+    }
+
+    public static String getUID(HttpServletRequest req) {
+        String uid = getVisitorId(req);
+
+        return uid;
+    }
     
     public static JSONObject getAllHeaders(HttpServletRequest req){
         JSONObject headerObj = new JSONObject();
@@ -60,18 +72,18 @@ public class IOUtils {
     }
 
     public static String getVisitorId(HttpServletRequest req) {
-        String visitorId = req.getParameter("visitorId");
+        String visitorId = req.getParameter("uid");
         if (!StringUtils.isEmpty(visitorId)) {
             return visitorId;
         }
-        visitorId = req.getParameter("vid");
+        visitorId = req.getParameter("_uid");
         if (!StringUtils.isEmpty(visitorId)) {
             return visitorId;
         }
         Cookie[] cookies = req.getCookies();
         if (cookies != null) {
             for (Cookie cook : cookies) {
-                if (cook.getName().equals("vid")) {
+                if (cook.getName().equals("_od.uid")) {
                     visitorId = cook.getValue();
                     return visitorId;
                 }

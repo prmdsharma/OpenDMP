@@ -19,13 +19,16 @@ public class ValidationService {
     @Autowired
     private DomainValidationConfig domainValidationConfig;
 
-    // private static final int MINUTE_MAX_RATE = 30;
-    // private static final int HOUR_MAX_RATE = 1000;
-    // private static final int DAY_MAX_RATE = 5000;
+    private static final int MINUTE_MAX_RATE = 30;
+    private static final int HOUR_MAX_RATE = 1000;
+    private static final int DAY_MAX_RATE = 5000;
 
     public boolean isValidRequest(HttpServletRequest req) {
         String ip = IOUtils.getClientIP(req);
-        if (isIpBlacklisted(ip)) {
+        String domain = IOUtils.getDomain(req);
+        String uid = IOUtils.getUID(req);
+
+        if (isIpBlacklisted(ip)||isDomainBlackListed(domain)||isDomainWhiteListed(domain)||isRateExceded(ip,uid)) {
             logger.debug("IP_BLACKLISTED : " + ip);
             return false;
         }
@@ -33,21 +36,22 @@ public class ValidationService {
         return true;
     }
 
-    private boolean isRateExceded(String sourceip, String visitorId) {
-        // final String key = visitorId+"_"+sourceip;
+    private boolean isRateExceded(String sourceip, String uid) {
+        final String key = uid + "_" + sourceip;
 
-        // if(checkRateExceededFromDB(key, "ip_rate_min", MINUTE_MAX_RATE,60)){
-        // logger.info("MINUTE_MAX_RATE_EXCEEDED : "+key);
-        // return true;
-        // }
-        // if(checkRateExceededFromDB(key, "ip_rate_hour", HOUR_MAX_RATE,3600)){
-        // logger.info("HOUR_MAX_RATE_EXCEEDED : "+key);
-        // return true;
-        // }
-        // if(checkRateExceededFromDB(key, "ip_rate_day", DAY_MAX_RATE,86400)){
-        // logger.info("DAY_MAX_RATE_EXCEEDED : "+key);
-        // return true;
-        // }
+        if(checkRateExceededFromCache(key, "ip_rate_min", MINUTE_MAX_RATE, 60)){
+            logger.info("MINUTE_MAX_RATE_EXCEEDED : " + key);
+            return true;
+        }
+        if(checkRateExceededFromCache(key, "ip_rate_hour", HOUR_MAX_RATE, 3600)){
+            logger.info("HOUR_MAX_RATE_EXCEEDED : " + key);
+            return true;
+        }
+        if(checkRateExceededFromCache(key, "ip_rate_day", DAY_MAX_RATE,86400)){
+            logger.info("DAY_MAX_RATE_EXCEEDED : " + key);
+            return true;
+        }
+
         return false;
     }
 
@@ -70,6 +74,17 @@ public class ValidationService {
         return false;
     }
 
+    private boolean checkRateExceededFromCache(String key,String rateType, int limit,int ttl) {
+        /*
+          todo
+          build  cacahe for this
+         */
+
+
+
+        return false;
+    }
+
     private boolean isIpBlacklisted(String sourceip) {
         /*
          todo validate the IP ;
@@ -80,8 +95,13 @@ public class ValidationService {
 
     private boolean isDomainBlackListed(String srcDomain) {
         boolean status = false;
-        if (! StringUtils.isEmpty(srcDomain)) {
-           status = domainValidationConfig.isDomainBlacklisted(srcDomain);
+        if(domainValidationConfig.isDomainBlacklistEnable()) {
+            if (! StringUtils.isEmpty(srcDomain)) {
+                if(! domainValidationConfig.isDomainBlacklisted(srcDomain))
+                    status = true;
+            }
+        } else {
+            status = true;
         }
 
         return status;
@@ -89,8 +109,12 @@ public class ValidationService {
 
     private boolean isDomainWhiteListed(String srcDomain){
         boolean status = false;
-        if (! StringUtils.isEmpty(srcDomain)) {
-            status = domainValidationConfig.isDomainWhitelisted(srcDomain);
+        if(domainValidationConfig.isDomainWhitelistEnable()) {
+            if (!StringUtils.isEmpty(srcDomain)) {
+                status = domainValidationConfig.isDomainWhitelisted(srcDomain);
+            }
+        }else {
+            status = true;
         }
 
         return status;
