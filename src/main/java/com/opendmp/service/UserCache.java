@@ -1,7 +1,5 @@
 package com.opendmp.service;
 
-
-
 /**
  * Created by pramod.sharma on 02/12/15.
  */

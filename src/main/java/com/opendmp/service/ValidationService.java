@@ -67,24 +67,6 @@ public class ValidationService {
         return false;
     }
 
-    private boolean checkRateExceededFromDB(String key, String table, int limit, int ttl) {
-//        DBRecord dbRecordSec = aeroSpikeDBManager.get(DB_NAME, table, key);
-//        if (dbRecordSec == null) {
-//            aeroSpikeDBManager.set(DB_NAME, table, key, 1, ttl);
-//        } else {
-//            JSONObject bins = dbRecordSec.getBins();
-//            if (bins != null && bins.get("value") instanceof Number) {
-//                Number number = (Number) bins.get("value");
-//                if (number.intValue() > limit) {
-//                    return true;
-//                }
-//                Map<String, Number> binValueMap = new HashMap<>();
-//                binValueMap.put("value", 1);
-//                aeroSpikeDBManager.incrementValue(DB_NAME, table, key, binValueMap, ttl);
-//            }
-//        }
-        return false;
-    }
 
     private boolean checkRateExceededFromCache(String key,String rateType, int limit,int ttl) {
         Boolean status = true;
