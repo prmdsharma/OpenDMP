@@ -10,7 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.opendmp.util.IOUtils;
+import com.opendmp.service.UserCache;
+
 import com.opendmp.conf.DomainValidationConfig;
+import com.google.common.cache.CacheBuilder;
+
+import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class ValidationService {
@@ -19,9 +24,16 @@ public class ValidationService {
     @Autowired
     private DomainValidationConfig domainValidationConfig;
 
+    @Autowired
+    private UserCache userCache;
+
     private static final int MINUTE_MAX_RATE = 30;
     private static final int HOUR_MAX_RATE = 1000;
     private static final int DAY_MAX_RATE = 5000;
+
+    private static final String IP_RATE_MIN = "IP_RATE_MIN";
+    private static final String IP_RATE_HOUR = "IP_RATE_HOUR";
+    private static final String IP_RATE_DAY= "IP_RATE_DAY";
 
     public boolean isValidRequest(HttpServletRequest req) {
         String ip = IOUtils.getClientIP(req);
@@ -39,15 +51,15 @@ public class ValidationService {
     private boolean isRateExceded(String sourceip, String uid) {
         final String key = uid + "_" + sourceip;
 
-        if(checkRateExceededFromCache(key, "ip_rate_min", MINUTE_MAX_RATE, 60)){
+        if(checkRateExceededFromCache(key, IP_RATE_MIN, MINUTE_MAX_RATE, 60)){
             logger.info("MINUTE_MAX_RATE_EXCEEDED : " + key);
             return true;
         }
-        if(checkRateExceededFromCache(key, "ip_rate_hour", HOUR_MAX_RATE, 3600)){
+        if(checkRateExceededFromCache(key, IP_RATE_HOUR, HOUR_MAX_RATE, 3600)){
             logger.info("HOUR_MAX_RATE_EXCEEDED : " + key);
             return true;
         }
-        if(checkRateExceededFromCache(key, "ip_rate_day", DAY_MAX_RATE,86400)){
+        if(checkRateExceededFromCache(key, IP_RATE_DAY, DAY_MAX_RATE,86400)){
             logger.info("DAY_MAX_RATE_EXCEEDED : " + key);
             return true;
         }
@@ -75,14 +87,30 @@ public class ValidationService {
     }
 
     private boolean checkRateExceededFromCache(String key,String rateType, int limit,int ttl) {
-        /*
-          todo
-          build  cacahe for this
-         */
+        Boolean status = true;
+        if(rateType.equals(IP_RATE_MIN)) {
+            userCache.updateUserMinuteCache(key);
+            AtomicLong uHits = userCache.getUseMinuterHits(key);
+            if (limit > uHits.intValue()) {
+                status = false;
+            }
+        }else if(rateType.equals(IP_RATE_HOUR)) {
+            userCache.updateUserHourCache(key);
+            AtomicLong uHits = userCache.getUserHourHits(key);
+            if (limit > uHits.intValue()) {
+                status = false;
+            }
+        } else if (rateType.equals(IP_RATE_DAY)) {
+            userCache.updateUserDayCache(key);
+            AtomicLong uHits = userCache.getUserDayHits(key);
+            if (limit > uHits.intValue()) {
+                status = false;
+            }
+        } else {
 
+        }
 
-
-        return false;
+        return status;
     }
 
     private boolean isIpBlacklisted(String sourceip) {
